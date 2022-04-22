@@ -20,31 +20,31 @@
     var CONFIG = {"hostname":"gayler-z.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
   </script>
 
-  <meta name="description" content="流水线冒险(hazard)结构冒险(structural hazard)硬件不支持多条指令在同一时钟周期执行。 解决方法： 增加功能部件 数据冒险(data hazard)数据相关 12add	x1, x2, x3sub	x4, x1, x5  解决方法：  阻塞 旁路（前递）(forwarding)    若第一条指令是 load x1 则需要在第四个阶段数据才可用，对于 sub 指令第三个阶段">
+  <meta name="description" content="RISC-V流水线数据、控制通路设计，数据、控制冒险解决与异常处理">
 <meta property="og:type" content="article">
-<meta property="og:title" content="流水线">
-<meta property="og:url" content="https://gayler-z.github.io/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/index.html">
+<meta property="og:title" content="计组笔记1：流水线CPU设计">
+<meta property="og:url" content="https://gayler-z.github.io/2022/04/21/%E8%AE%A1%E7%BB%84%E7%AC%94%E8%AE%B01%EF%BC%9A%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/index.html">
 <meta property="og:site_name" content="Gayler&#39;s Blog">
-<meta property="og:description" content="流水线冒险(hazard)结构冒险(structural hazard)硬件不支持多条指令在同一时钟周期执行。 解决方法： 增加功能部件 数据冒险(data hazard)数据相关 12add	x1, x2, x3sub	x4, x1, x5  解决方法：  阻塞 旁路（前递）(forwarding)    若第一条指令是 load x1 则需要在第四个阶段数据才可用，对于 sub 指令第三个阶段">
+<meta property="og:description" content="RISC-V流水线数据、控制通路设计，数据、控制冒险解决与异常处理">
 <meta property="og:locale" content="zh_CN">
-<meta property="og:image" content="https://gayler-z.github.io/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/forwarding.bmp">
-<meta property="og:image" content="https://gayler-z.github.io/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/load_use_data_hazard.bmp">
-<meta property="og:image" content="https://gayler-z.github.io/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_datapath.bmp">
-<meta property="og:image" content="https://gayler-z.github.io/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_control.bmp">
-<meta property="og:image" content="https://gayler-z.github.io/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/data_hazard_example.bmp">
-<meta property="og:image" content="https://gayler-z.github.io/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/data_hazard_and_stall_example.jpg">
-<meta property="og:image" content="https://gayler-z.github.io/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_control.jpg">
-<meta property="og:image" content="https://gayler-z.github.io/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/reduce_branch_delay.png">
-<meta property="og:image" content="https://gayler-z.github.io/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/2bit_predictor.png">
-<meta property="og:image" content="https://gayler-z.github.io/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_exception.png">
+<meta property="og:image" content="https://gayler-z.github.io/2022/04/21/%E8%AE%A1%E7%BB%84%E7%AC%94%E8%AE%B01%EF%BC%9A%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/forwarding.bmp">
+<meta property="og:image" content="https://gayler-z.github.io/2022/04/21/%E8%AE%A1%E7%BB%84%E7%AC%94%E8%AE%B01%EF%BC%9A%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/load_use_data_hazard.bmp">
+<meta property="og:image" content="https://gayler-z.github.io/2022/04/21/%E8%AE%A1%E7%BB%84%E7%AC%94%E8%AE%B01%EF%BC%9A%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_datapath.bmp">
+<meta property="og:image" content="https://gayler-z.github.io/2022/04/21/%E8%AE%A1%E7%BB%84%E7%AC%94%E8%AE%B01%EF%BC%9A%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_control.bmp">
+<meta property="og:image" content="https://gayler-z.github.io/2022/04/21/%E8%AE%A1%E7%BB%84%E7%AC%94%E8%AE%B01%EF%BC%9A%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/data_hazard_example.bmp">
+<meta property="og:image" content="https://gayler-z.github.io/2022/04/21/%E8%AE%A1%E7%BB%84%E7%AC%94%E8%AE%B01%EF%BC%9A%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/data_hazard_and_stall_example.jpg">
+<meta property="og:image" content="https://gayler-z.github.io/2022/04/21/%E8%AE%A1%E7%BB%84%E7%AC%94%E8%AE%B01%EF%BC%9A%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_control.jpg">
+<meta property="og:image" content="https://gayler-z.github.io/2022/04/21/%E8%AE%A1%E7%BB%84%E7%AC%94%E8%AE%B01%EF%BC%9A%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/reduce_branch_delay.png">
+<meta property="og:image" content="https://gayler-z.github.io/2022/04/21/%E8%AE%A1%E7%BB%84%E7%AC%94%E8%AE%B01%EF%BC%9A%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/2bit_predictor.png">
+<meta property="og:image" content="https://gayler-z.github.io/2022/04/21/%E8%AE%A1%E7%BB%84%E7%AC%94%E8%AE%B01%EF%BC%9A%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_exception.png">
 <meta property="article:published_time" content="2022-04-21T12:33:57.000Z">
-<meta property="article:modified_time" content="2022-04-22T12:39:56.227Z">
+<meta property="article:modified_time" content="2022-04-22T15:50:00.000Z">
 <meta property="article:author" content="Gayler">
 <meta property="article:tag" content="计算机组成与设计RISC-V笔记">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:image" content="https://gayler-z.github.io/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/forwarding.bmp">
+<meta name="twitter:image" content="https://gayler-z.github.io/2022/04/21/%E8%AE%A1%E7%BB%84%E7%AC%94%E8%AE%B01%EF%BC%9A%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/forwarding.bmp">
 
-<link rel="canonical" href="https://gayler-z.github.io/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/">
+<link rel="canonical" href="https://gayler-z.github.io/2022/04/21/%E8%AE%A1%E7%BB%84%E7%AC%94%E8%AE%B01%EF%BC%9A%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/">
 
 
 <script id="page-configurations">
@@ -57,7 +57,7 @@
   };
 </script>
 
-  <title>流水线 | Gayler's Blog</title>
+  <title>计组笔记1：流水线CPU设计 | Gayler's Blog</title>
   
 
 
@@ -201,7 +201,7 @@
   
   
   <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
-    <link itemprop="mainEntityOfPage" href="https://gayler-z.github.io/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/">
+    <link itemprop="mainEntityOfPage" href="https://gayler-z.github.io/2022/04/21/%E8%AE%A1%E7%BB%84%E7%AC%94%E8%AE%B01%EF%BC%9A%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="image" content="/images/avatar.gif">
@@ -214,7 +214,7 @@
     </span>
       <header class="post-header">
         <h1 class="post-title" itemprop="name headline">
-          流水线
+          计组笔记1：流水线CPU设计
         </h1>
 
         <div class="post-meta">
@@ -231,7 +231,7 @@
                   <i class="far fa-calendar-check"></i>
                 </span>
                 <span class="post-meta-item-text">更新于</span>
-                <time title="修改时间：2022-04-22 20:39:56" itemprop="dateModified" datetime="2022-04-22T20:39:56+08:00">2022-04-22</time>
+                <time title="修改时间：2022-04-22 23:50:00" itemprop="dateModified" datetime="2022-04-22T23:50:00+08:00">2022-04-22</time>
               </span>
             <span class="post-meta-item">
               <span class="post-meta-item-icon">
@@ -244,6 +244,14 @@
             </span>
 
           
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span>
+            <div class="post-description">RISC-V流水线数据、控制通路设计，数据、控制冒险解决与异常处理</div>
 
         </div>
       </header>
@@ -265,10 +273,10 @@
 <li>阻塞</li>
 <li>旁路（前递）(forwarding)</li>
 </ul>
-<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/forwarding.bmp" class="" title="流水线前递">
+<img src="/2022/04/21/%E8%AE%A1%E7%BB%84%E7%AC%94%E8%AE%B01%EF%BC%9A%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/forwarding.bmp" class="" title="流水线前递">
 
 <p>若第一条指令是 <code>load x1</code> 则需要在第四个阶段数据才可用，对于 <code>sub</code> 指令第三个阶段的输入来说太迟了，造成 <strong>载入-使用型数据冒险</strong> ，需要使用 <strong>流水线停顿</strong> 处理。</p>
-<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/load_use_data_hazard.bmp" class="" title="载入-使用型数据冒险">
+<img src="/2022/04/21/%E8%AE%A1%E7%BB%84%E7%AC%94%E8%AE%B01%EF%BC%9A%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/load_use_data_hazard.bmp" class="" title="载入-使用型数据冒险">
 
 
 
@@ -291,7 +299,7 @@
 <li>WB：写回</li>
 </ol>
 <p>PC可以被看做一个流水线寄存器，它给IF阶段提供数据。但PC是可见体系结构的一部分，发生例外时，PC中的内容 <strong>必须被保存</strong> ，而流水线寄存器中的内容可以被丢弃。</p>
-<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_datapath.bmp" class="" title="完整流水线数据通路">
+<img src="/2022/04/21/%E8%AE%A1%E7%BB%84%E7%AC%94%E8%AE%B01%EF%BC%9A%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_datapath.bmp" class="" title="完整流水线数据通路">
 
 
 
@@ -304,14 +312,14 @@
 <li>WB：需要设置 MemtoReg 和 RegWrite ，控制寄存器写入</li>
 </ol>
 <p>对控制线的需要从EX阶段开始，故可以在 ID 阶段为之后阶段创建控制信号，并将控制信号保存在流水线寄存器中。</p>
-<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_control.bmp" class="" title="流水线控制通路">
+<img src="/2022/04/21/%E8%AE%A1%E7%BB%84%E7%AC%94%E8%AE%B01%EF%BC%9A%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_control.bmp" class="" title="流水线控制通路">
 
 
 
 <h1 id="流水线数据冒险：前递与停顿"><a href="#流水线数据冒险：前递与停顿" class="headerlink" title="流水线数据冒险：前递与停顿"></a>流水线数据冒险：前递与停顿</h1><p>多条数据相关指令：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sub	x2, x1, x3</span><br><span class="line">and	x12, x2, x5</span><br><span class="line">or	x13, x6, x2</span><br><span class="line">add	x14, x2, x2</span><br><span class="line">sd	x15, 100(x2)</span><br></pre></td></tr></table></figure>
 
-<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/data_hazard_example.bmp" class="" title="多周期流水线图">
+<img src="/2022/04/21/%E8%AE%A1%E7%BB%84%E7%AC%94%E8%AE%B01%EF%BC%9A%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/data_hazard_example.bmp" class="" title="多周期流水线图">
 
 <p>在第三个时钟周期 <code>sub</code> 指令就产生结果，而 <code>and</code> 和 <code>or</code> 指令在第四和第五个周期才真正需要数据，因此只要将数据前递即可避免数据冒险。</p>
 <p>WB 阶段不存在数据冒险，因为可以通过前半周期写后半周期读来解决。</p>
@@ -333,7 +341,7 @@
 
 
 <h2 id="数据冒险与停顿"><a href="#数据冒险与停顿" class="headerlink" title="数据冒险与停顿"></a>数据冒险与停顿</h2><p>当一条指令在加载指令写入一个寄存器之后读取这个寄存器，前递无法解决冒险。</p>
-<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/data_hazard_and_stall_example.jpg" class="" title="加载指令导致前递无法解决的冒险">
+<img src="/2022/04/21/%E8%AE%A1%E7%BB%84%E7%AC%94%E8%AE%B01%EF%BC%9A%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/data_hazard_and_stall_example.jpg" class="" title="加载指令导致前递无法解决的冒险">
 
 <p>此时需要增加冒险检测单元添加流水线阻塞，阻塞条件为：</p>
 <figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">if (ID/EX.MemRead and</span><br><span class="line">	((ID/EX.RegisterRd = IF/ID.RegisterRs1) or</span><br><span class="line">	(ID/EX.RegisterRd = IF/ID.RegisterRs2))) stall the pipeline</span><br></pre></td></tr></table></figure>
@@ -343,7 +351,7 @@
 <li>禁止 PC 寄存器和 IF&#x2F;ID 流水线寄存器改变(保护寄存器)</li>
 <li>EX 阶段开始的流水线后半部分执行<strong>空指令</strong>，解出 EX ， MEM 和 WB 阶段的七个控制信号(设置为0)</li>
 </ol>
-<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_control.jpg" class="" title="流水线控制图概览">
+<img src="/2022/04/21/%E8%AE%A1%E7%BB%84%E7%AC%94%E8%AE%B01%EF%BC%9A%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_control.jpg" class="" title="流水线控制图概览">
 
 
 
@@ -359,14 +367,14 @@
 <li>在 ID 阶段分支比较需要的值可能之后才会产生( ALU 指令接着分支，加载指令接着分支)，流水线停顿是必须的</li>
 </ol>
 <p>清除IF阶段指令：添加一条 IF.Flush 控制线，将 IF&#x2F;ID 流水线寄存器指令字段设置为 0 (空操作)。</p>
-<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/reduce_branch_delay.png" class="" title="缩短分支延迟">
+<img src="/2022/04/21/%E8%AE%A1%E7%BB%84%E7%AC%94%E8%AE%B01%EF%BC%9A%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/reduce_branch_delay.png" class="" title="缩短分支延迟">
 
 <p>优化能力：将分支发生的代价减轻为一条指令</p>
 <h2 id="动态分支预测"><a href="#动态分支预测" class="headerlink" title="动态分支预测"></a>动态分支预测</h2><p>实现方案：<strong>分支预测缓存</strong>或<strong>分支历史表</strong></p>
 <p>分支预测缓存：一块按照分支指令的低位地址定位的小容量存储器，包含 1 个比特，用于表明一个分支最近是否发生跳转</p>
 <p>缺点：即使一个分支条件总是发生跳转，但一旦其不发生跳转时，就会造成两次预测错误，而不是只造成一次错误</p>
 <p>纠正： 2 位预测机制(有限状态自动机)</p>
-<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/2bit_predictor.png" class="" title="2位预测机制的有限状态自动机">
+<img src="/2022/04/21/%E8%AE%A1%E7%BB%84%E7%AC%94%E8%AE%B01%EF%BC%9A%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/2bit_predictor.png" class="" title="2位预测机制的有限状态自动机">
 
 <p>分支目标缓存：分支预测其只告知条件分支是否发生跳转，但依然需要对分支目标地址进行计算。在五级流水线中，这种计算需要一个时钟周期。一种解决方案是 <strong>缓存目标地址</strong></p>
 <p>其他预测器：</p>
@@ -375,8 +383,8 @@
 <li>锦标赛预测器：一个对于每个分支具有多种预测的分支预测器，其具有一种选择机制，该机制选择对于给定分支选择哪个预测器作为预测结果</li>
 </ol>
 <h1 id="异常和中断"><a href="#异常和中断" class="headerlink" title="异常和中断"></a>异常和中断</h1><h2 id="RISC-V体系结构中异常处理"><a href="#RISC-V体系结构中异常处理" class="headerlink" title="RISC-V体系结构中异常处理"></a>RISC-V体系结构中异常处理</h2><p>必须执行的基本动作：在 <strong>系统异常程序计数器(Supervisor Exception Program Counter， SEPC)</strong> 中保存发生异常的指令地址，同时将控制权转交给操作系统</p>
-<p>**系统异常原因寄存器(Supervisor Exception Cause Register， SCAUSE)**：记录异常产生原因</p>
-<p>**向量式终端(vectored interrupt)**：用基址寄存器加上例外原因(作为偏移)作为目标地址来完成控制流转换</p>
+<p><strong>系统异常原因寄存器(Supervisor Exception Cause Register， SCAUSE)</strong> ：记录异常产生原因</p>
+<p><strong>向量式终端(vectored interrupt)</strong> ：用基址寄存器加上例外原因(作为偏移)作为目标地址来完成控制流转换</p>
 <p>假设，我们使用统一入口地址方式（系统异常原因寄存器）实现异常处理，设置地址为 0x 0000 0000 1C09 0000。因此，需要添加两个额外的寄存器： </p>
 <ol>
 <li>SEPC：64位寄存器，保存异常指令的地址（向量式也需要）</li>
@@ -390,7 +398,7 @@
 <li>添加新的控制信号 EX.Flush，杀跌多选器输出为 0</li>
 <li>为 PC 多选器增加新的输入，保证能将例外入口地址送给 PC 寄存器</li>
 </ol>
-<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_exception.png" class="" title="流水线异常处理">
+<img src="/2022/04/21/%E8%AE%A1%E7%BB%84%E7%AC%94%E8%AE%B01%EF%BC%9A%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_exception.png" class="" title="流水线异常处理">
 
 <p>SEPC 寄存器保存引发例外的指令地址。如果由多个例外同时发生，SCAUSE 寄存器中记录当前最高优先级的例外信息。</p>
 
@@ -402,7 +410,7 @@
 
       <footer class="post-footer">
           <div class="post-tags">
-              <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E4%B8%8E%E8%AE%BE%E8%AE%A1RISC-V%E7%AC%94%E8%AE%B0/" rel="tag"># 计算机组成与设计RISC-V笔记</a>
+              <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E4%B8%8E%E8%AE%BE%E8%AE%A1RISC-V%E7%AC%94%E8%AE%B0/" rel="tag"><i class="fa fa-tag"></i> 计算机组成与设计RISC-V笔记</a>
           </div>
 
         
@@ -487,20 +495,20 @@
       <div class="site-state-item site-state-posts">
           <a href="/archives/">
         
-          <span class="site-state-item-count">2</span>
+          <span class="site-state-item-count">3</span>
           <span class="site-state-item-name">日志</span>
         </a>
       </div>
       <div class="site-state-item site-state-categories">
             <a href="/categories/">
           
-        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-count">3</span>
         <span class="site-state-item-name">分类</span></a>
       </div>
       <div class="site-state-item site-state-tags">
             <a href="/tags/">
           
-        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-count">3</span>
         <span class="site-state-item-name">标签</span></a>
       </div>
   </nav>
@@ -535,6 +543,26 @@
 </div>
 
         
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
 
 
 

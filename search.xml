@@ -20,10 +20,13 @@
       <categories>
         <category>软件破解</category>
       </categories>
+      <tags>
+        <tag>软件破解教程</tag>
+      </tags>
   </entry>
   <entry>
-    <title>流水线</title>
-    <url>/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/</url>
+    <title>计组笔记1：流水线CPU设计</title>
+    <url>/2022/04/21/%E8%AE%A1%E7%BB%84%E7%AC%94%E8%AE%B01%EF%BC%9A%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/</url>
     <content><![CDATA[<h1 id="流水线冒险-hazard"><a href="#流水线冒险-hazard" class="headerlink" title="流水线冒险(hazard)"></a>流水线冒险(hazard)</h1><h2 id="结构冒险-structural-hazard"><a href="#结构冒险-structural-hazard" class="headerlink" title="结构冒险(structural hazard)"></a>结构冒险(structural hazard)</h2><p>硬件不支持多条指令在同一时钟周期执行。</p>
 <p>解决方法：</p>
 <p>增加功能部件</p>
@@ -35,10 +38,10 @@
 <li>阻塞</li>
 <li>旁路（前递）(forwarding)</li>
 </ul>
-<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/forwarding.bmp" class="" title="流水线前递">
+<img src="/2022/04/21/%E8%AE%A1%E7%BB%84%E7%AC%94%E8%AE%B01%EF%BC%9A%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/forwarding.bmp" class="" title="流水线前递">
 
 <p>若第一条指令是 <code>load x1</code> 则需要在第四个阶段数据才可用，对于 <code>sub</code> 指令第三个阶段的输入来说太迟了，造成 <strong>载入-使用型数据冒险</strong> ，需要使用 <strong>流水线停顿</strong> 处理。</p>
-<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/load_use_data_hazard.bmp" class="" title="载入-使用型数据冒险">
+<img src="/2022/04/21/%E8%AE%A1%E7%BB%84%E7%AC%94%E8%AE%B01%EF%BC%9A%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/load_use_data_hazard.bmp" class="" title="载入-使用型数据冒险">
 
 
 
@@ -61,7 +64,7 @@
 <li>WB：写回</li>
 </ol>
 <p>PC可以被看做一个流水线寄存器，它给IF阶段提供数据。但PC是可见体系结构的一部分，发生例外时，PC中的内容 <strong>必须被保存</strong> ，而流水线寄存器中的内容可以被丢弃。</p>
-<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_datapath.bmp" class="" title="完整流水线数据通路">
+<img src="/2022/04/21/%E8%AE%A1%E7%BB%84%E7%AC%94%E8%AE%B01%EF%BC%9A%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_datapath.bmp" class="" title="完整流水线数据通路">
 
 
 
@@ -74,14 +77,14 @@
 <li>WB：需要设置 MemtoReg 和 RegWrite ，控制寄存器写入</li>
 </ol>
 <p>对控制线的需要从EX阶段开始，故可以在 ID 阶段为之后阶段创建控制信号，并将控制信号保存在流水线寄存器中。</p>
-<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_control.bmp" class="" title="流水线控制通路">
+<img src="/2022/04/21/%E8%AE%A1%E7%BB%84%E7%AC%94%E8%AE%B01%EF%BC%9A%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_control.bmp" class="" title="流水线控制通路">
 
 
 
 <h1 id="流水线数据冒险：前递与停顿"><a href="#流水线数据冒险：前递与停顿" class="headerlink" title="流水线数据冒险：前递与停顿"></a>流水线数据冒险：前递与停顿</h1><p>多条数据相关指令：</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sub	x2, x1, x3</span><br><span class="line">and	x12, x2, x5</span><br><span class="line">or	x13, x6, x2</span><br><span class="line">add	x14, x2, x2</span><br><span class="line">sd	x15, 100(x2)</span><br></pre></td></tr></table></figure>
 
-<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/data_hazard_example.bmp" class="" title="多周期流水线图">
+<img src="/2022/04/21/%E8%AE%A1%E7%BB%84%E7%AC%94%E8%AE%B01%EF%BC%9A%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/data_hazard_example.bmp" class="" title="多周期流水线图">
 
 <p>在第三个时钟周期 <code>sub</code> 指令就产生结果，而 <code>and</code> 和 <code>or</code> 指令在第四和第五个周期才真正需要数据，因此只要将数据前递即可避免数据冒险。</p>
 <p>WB 阶段不存在数据冒险，因为可以通过前半周期写后半周期读来解决。</p>
@@ -103,7 +106,7 @@
 
 
 <h2 id="数据冒险与停顿"><a href="#数据冒险与停顿" class="headerlink" title="数据冒险与停顿"></a>数据冒险与停顿</h2><p>当一条指令在加载指令写入一个寄存器之后读取这个寄存器，前递无法解决冒险。</p>
-<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/data_hazard_and_stall_example.jpg" class="" title="加载指令导致前递无法解决的冒险">
+<img src="/2022/04/21/%E8%AE%A1%E7%BB%84%E7%AC%94%E8%AE%B01%EF%BC%9A%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/data_hazard_and_stall_example.jpg" class="" title="加载指令导致前递无法解决的冒险">
 
 <p>此时需要增加冒险检测单元添加流水线阻塞，阻塞条件为：</p>
 <figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">if (ID/EX.MemRead and</span><br><span class="line">	((ID/EX.RegisterRd = IF/ID.RegisterRs1) or</span><br><span class="line">	(ID/EX.RegisterRd = IF/ID.RegisterRs2))) stall the pipeline</span><br></pre></td></tr></table></figure>
@@ -113,7 +116,7 @@
 <li>禁止 PC 寄存器和 IF&#x2F;ID 流水线寄存器改变(保护寄存器)</li>
 <li>EX 阶段开始的流水线后半部分执行<strong>空指令</strong>，解出 EX ， MEM 和 WB 阶段的七个控制信号(设置为0)</li>
 </ol>
-<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_control.jpg" class="" title="流水线控制图概览">
+<img src="/2022/04/21/%E8%AE%A1%E7%BB%84%E7%AC%94%E8%AE%B01%EF%BC%9A%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_control.jpg" class="" title="流水线控制图概览">
 
 
 
@@ -129,14 +132,14 @@
 <li>在 ID 阶段分支比较需要的值可能之后才会产生( ALU 指令接着分支，加载指令接着分支)，流水线停顿是必须的</li>
 </ol>
 <p>清除IF阶段指令：添加一条 IF.Flush 控制线，将 IF&#x2F;ID 流水线寄存器指令字段设置为 0 (空操作)。</p>
-<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/reduce_branch_delay.png" class="" title="缩短分支延迟">
+<img src="/2022/04/21/%E8%AE%A1%E7%BB%84%E7%AC%94%E8%AE%B01%EF%BC%9A%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/reduce_branch_delay.png" class="" title="缩短分支延迟">
 
 <p>优化能力：将分支发生的代价减轻为一条指令</p>
 <h2 id="动态分支预测"><a href="#动态分支预测" class="headerlink" title="动态分支预测"></a>动态分支预测</h2><p>实现方案：<strong>分支预测缓存</strong>或<strong>分支历史表</strong></p>
 <p>分支预测缓存：一块按照分支指令的低位地址定位的小容量存储器，包含 1 个比特，用于表明一个分支最近是否发生跳转</p>
 <p>缺点：即使一个分支条件总是发生跳转，但一旦其不发生跳转时，就会造成两次预测错误，而不是只造成一次错误</p>
 <p>纠正： 2 位预测机制(有限状态自动机)</p>
-<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/2bit_predictor.png" class="" title="2位预测机制的有限状态自动机">
+<img src="/2022/04/21/%E8%AE%A1%E7%BB%84%E7%AC%94%E8%AE%B01%EF%BC%9A%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/2bit_predictor.png" class="" title="2位预测机制的有限状态自动机">
 
 <p>分支目标缓存：分支预测其只告知条件分支是否发生跳转，但依然需要对分支目标地址进行计算。在五级流水线中，这种计算需要一个时钟周期。一种解决方案是 <strong>缓存目标地址</strong></p>
 <p>其他预测器：</p>
@@ -145,8 +148,8 @@
 <li>锦标赛预测器：一个对于每个分支具有多种预测的分支预测器，其具有一种选择机制，该机制选择对于给定分支选择哪个预测器作为预测结果</li>
 </ol>
 <h1 id="异常和中断"><a href="#异常和中断" class="headerlink" title="异常和中断"></a>异常和中断</h1><h2 id="RISC-V体系结构中异常处理"><a href="#RISC-V体系结构中异常处理" class="headerlink" title="RISC-V体系结构中异常处理"></a>RISC-V体系结构中异常处理</h2><p>必须执行的基本动作：在 <strong>系统异常程序计数器(Supervisor Exception Program Counter， SEPC)</strong> 中保存发生异常的指令地址，同时将控制权转交给操作系统</p>
-<p>**系统异常原因寄存器(Supervisor Exception Cause Register， SCAUSE)**：记录异常产生原因</p>
-<p>**向量式终端(vectored interrupt)**：用基址寄存器加上例外原因(作为偏移)作为目标地址来完成控制流转换</p>
+<p><strong>系统异常原因寄存器(Supervisor Exception Cause Register， SCAUSE)</strong> ：记录异常产生原因</p>
+<p><strong>向量式终端(vectored interrupt)</strong> ：用基址寄存器加上例外原因(作为偏移)作为目标地址来完成控制流转换</p>
 <p>假设，我们使用统一入口地址方式（系统异常原因寄存器）实现异常处理，设置地址为 0x 0000 0000 1C09 0000。因此，需要添加两个额外的寄存器： </p>
 <ol>
 <li>SEPC：64位寄存器，保存异常指令的地址（向量式也需要）</li>
@@ -160,7 +163,7 @@
 <li>添加新的控制信号 EX.Flush，杀跌多选器输出为 0</li>
 <li>为 PC 多选器增加新的输入，保证能将例外入口地址送给 PC 寄存器</li>
 </ol>
-<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_exception.png" class="" title="流水线异常处理">
+<img src="/2022/04/21/%E8%AE%A1%E7%BB%84%E7%AC%94%E8%AE%B01%EF%BC%9A%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_exception.png" class="" title="流水线异常处理">
 
 <p>SEPC 寄存器保存引发例外的指令地址。如果由多个例外同时发生，SCAUSE 寄存器中记录当前最高优先级的例外信息。</p>
 ]]></content>
@@ -169,6 +172,17 @@
       </categories>
       <tags>
         <tag>计算机组成与设计RISC-V笔记</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>计网笔记1：基础</title>
+    <url>/2022/04/22/%E8%AE%A1%E7%BD%91%E7%AC%94%E8%AE%B01%EF%BC%9A%E5%9F%BA%E7%A1%80/</url>
+    <content><![CDATA[]]></content>
+      <categories>
+        <category>计算机网络</category>
+      </categories>
+      <tags>
+        <tag>计算机网络：系统方法笔记</tag>
       </tags>
   </entry>
 </search>
