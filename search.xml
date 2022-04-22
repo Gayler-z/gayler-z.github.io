@@ -1,26 +1,174 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
-    <title>Hello World</title>
-    <url>/2022/04/21/hello-world/</url>
-    <content><![CDATA[<p>Welcome to <a href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
+    <title>Typora破解</title>
+    <url>/2022/04/21/Typora%E7%A0%B4%E8%A7%A3/</url>
+    <content><![CDATA[<h1 id="下载"><a href="#下载" class="headerlink" title="下载"></a>下载</h1><ul>
+<li><a href="https://lanzouv.com/b04cdi4if">https://lanzouv.com/b04cdi4if</a>　（含破解文件）<br>密码：dyuh</li>
+</ul>
+<h1 id="破解"><a href="#破解" class="headerlink" title="破解"></a>破解</h1><h2 id="覆盖文件"><a href="#覆盖文件" class="headerlink" title="覆盖文件"></a>覆盖文件</h2><p>将app.asar.txt后缀”.txt”去掉，并覆盖安装路径的”resources”文件夹内同名文件。</p>
+<h2 id="输入序列号"><a href="#输入序列号" class="headerlink" title="输入序列号"></a>输入序列号</h2><p>打开Typora，邮箱任意填写，输入序列号：</p>
+<ul>
+<li>DZTX2H-6MCQZT-QL4GCT-5EBWFX</li>
+<li>G7LPKN-HP4NLD-FA3BGF-6JDQ5R</li>
+<li>3MH4Y8-YJWT37-G5JL9Y-UHNQDJ</li>
+<li>85ZPHY-ELQ9FQ-94J3VP-D92YLU</li>
+<li>VEZ7NV-USYN3G-8TL2N3-DADUG4</li>
+</ul>
+<p>即可直接激活。</p>
 ]]></content>
+      <categories>
+        <category>软件破解</category>
+      </categories>
   </entry>
   <entry>
-    <title>test_my_site</title>
-    <url>/2022/04/21/test-my-site/</url>
-    <content><![CDATA[]]></content>
+    <title>流水线</title>
+    <url>/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/</url>
+    <content><![CDATA[<h1 id="流水线冒险-hazard"><a href="#流水线冒险-hazard" class="headerlink" title="流水线冒险(hazard)"></a>流水线冒险(hazard)</h1><h2 id="结构冒险-structural-hazard"><a href="#结构冒险-structural-hazard" class="headerlink" title="结构冒险(structural hazard)"></a>结构冒险(structural hazard)</h2><p>硬件不支持多条指令在同一时钟周期执行。</p>
+<p>解决方法：</p>
+<p>增加功能部件</p>
+<h2 id="数据冒险-data-hazard"><a href="#数据冒险-data-hazard" class="headerlink" title="数据冒险(data hazard)"></a>数据冒险(data hazard)</h2><p>数据相关</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">add	x1, x2, x3</span><br><span class="line">sub	x4, x1, x5</span><br></pre></td></tr></table></figure>
+
+<p>解决方法：</p>
+<ul>
+<li>阻塞</li>
+<li>旁路（前递）(forwarding)</li>
+</ul>
+<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/forwarding.bmp" class="" title="流水线前递">
+
+<p>若第一条指令是 <code>load x1</code> 则需要在第四个阶段数据才可用，对于 <code>sub</code> 指令第三个阶段的输入来说太迟了，造成 <strong>载入-使用型数据冒险</strong> ，需要使用 <strong>流水线停顿</strong> 处理。</p>
+<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/load_use_data_hazard.bmp" class="" title="载入-使用型数据冒险">
+
+
+
+<h2 id="控制冒险-control-hazard"><a href="#控制冒险-control-hazard" class="headerlink" title="控制冒险(control hazard)"></a>控制冒险(control hazard)</h2><p>需要根据一条指令的结果做出决定，而其他指令正在执行。</p>
+<p>解决方法：</p>
+<ul>
+<li>阻塞</li>
+<li>预测<ul>
+<li>静态预测：分支总是不发生</li>
+<li>动态预测：根据分支历史情况预测</li>
+</ul>
+</li>
+</ul>
+<h1 id="流水线数据通路和控制"><a href="#流水线数据通路和控制" class="headerlink" title="流水线数据通路和控制"></a>流水线数据通路和控制</h1><h2 id="流水线数据通路"><a href="#流水线数据通路" class="headerlink" title="流水线数据通路"></a>流水线数据通路</h2><p>将数据通路划分成五部分：</p>
+<ol>
+<li>IF：取指令</li>
+<li>ID：指令译码金额读寄存器</li>
+<li>EX：执行或计算地址</li>
+<li>MEM：数据存储器访问</li>
+<li>WB：写回</li>
+</ol>
+<p>PC可以被看做一个流水线寄存器，它给IF阶段提供数据。但PC是可见体系结构的一部分，发生例外时，PC中的内容 <strong>必须被保存</strong> ，而流水线寄存器中的内容可以被丢弃。</p>
+<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_datapath.bmp" class="" title="完整流水线数据通路">
+
+
+
+<h2 id="流水线控制"><a href="#流水线控制" class="headerlink" title="流水线控制"></a>流水线控制</h2><p>根据流水线阶段将控制线分成五组：</p>
+<ol>
+<li>IF：读指令存储器和写 PC 控制信号总是有效，无需其他控制</li>
+<li>ID：两个源寄存器总是位于相同的位置，无需其他控制</li>
+<li>EX：需要设置 ALUOp 和 ALUSrc 控制 ALU 的输入选择和操作选择</li>
+<li>MEM：需要设置 Branch ， MemRead 和 MemWrite 控制分支，加载和存储指令</li>
+<li>WB：需要设置 MemtoReg 和 RegWrite ，控制寄存器写入</li>
+</ol>
+<p>对控制线的需要从EX阶段开始，故可以在 ID 阶段为之后阶段创建控制信号，并将控制信号保存在流水线寄存器中。</p>
+<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_control.bmp" class="" title="流水线控制通路">
+
+
+
+<h1 id="流水线数据冒险：前递与停顿"><a href="#流水线数据冒险：前递与停顿" class="headerlink" title="流水线数据冒险：前递与停顿"></a>流水线数据冒险：前递与停顿</h1><p>多条数据相关指令：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">sub	x2, x1, x3</span><br><span class="line">and	x12, x2, x5</span><br><span class="line">or	x13, x6, x2</span><br><span class="line">add	x14, x2, x2</span><br><span class="line">sd	x15, 100(x2)</span><br></pre></td></tr></table></figure>
+
+<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/data_hazard_example.bmp" class="" title="多周期流水线图">
+
+<p>在第三个时钟周期 <code>sub</code> 指令就产生结果，而 <code>and</code> 和 <code>or</code> 指令在第四和第五个周期才真正需要数据，因此只要将数据前递即可避免数据冒险。</p>
+<p>WB 阶段不存在数据冒险，因为可以通过前半周期写后半周期读来解决。</p>
+<p>两对冒险条件(存在冒险且不前递 <code>x0</code> 寄存器)：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">1.EX冒险</span><br><span class="line">if (EX/MEM.RegWrite</span><br><span class="line">and (EX/MEM.RegisterRd != 0) </span><br><span class="line">and (EX/MEM.RegisterRd = ID/EX.RegisterRs1)) ForwardA = 10</span><br><span class="line"></span><br><span class="line">if (EX/MEM.RegWrite</span><br><span class="line">and (EX/MEM.RegisterRd != 0)</span><br><span class="line">and (EX/MEM.RegisterRd = ID/EX.RegisterRs2)) ForwardB = 10</span><br><span class="line"></span><br><span class="line">2.MEM冒险</span><br><span class="line">if (MEM/WB.RegWrite</span><br><span class="line">and (MEM/WB.RegisterRd != 0)</span><br><span class="line">and (MEM/WB.RegisterRd = ID/EX.RegisterRs1)) ForwardA = 01</span><br><span class="line"></span><br><span class="line">if (MEM/WB.RegWrite</span><br><span class="line">and (MEM/WB.RegisterRd != 0)</span><br><span class="line">and (MEM/WB.RegisterRd = ID/EX.RegisterRs2)) ForwardB = 01</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="更为复杂的数据冒险"><a href="#更为复杂的数据冒险" class="headerlink" title="更为复杂的数据冒险"></a>更为复杂的数据冒险</h2><p>在 WB 阶段指令的结果， MEM 阶段指令的结果和 ALU 阶段指令的源操作数之间发生。</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">add	x1, x1, x2</span><br><span class="line">add	x1, x1, x3</span><br><span class="line">add	x1, x1, x4</span><br></pre></td></tr></table></figure>
+
+<p>在这种情况下，结果应该来自 MEM 阶段前递的数据( EX&#x2F;MEM 寄存器的数据)，因为 MEM 阶段中的结果就是最近的结果。因此， MEM 冒险的控制为：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">if (MEM/WB.RegWrite</span><br><span class="line">and (MEM/WB.RegisterRd != 0)</span><br><span class="line">and not (EX/MEM.RegWrite and (EX/MEM.RegisterRd != 0)</span><br><span class="line">		and (EX/MEM.RegisterRd = ID/EX.RegisterRs1))</span><br><span class="line">and (MEM/WB.RegisterRd = ID/EX.RegisterRs1)) ForwardA = 01</span><br><span class="line"></span><br><span class="line">if (MEM/WB.RegWrite</span><br><span class="line">and (MEM/WB.RegisterRd != 0)</span><br><span class="line">and not (EX/MEM.RegWrite and (EX/MEM.RegisterRd != 0)</span><br><span class="line">		and (EX/MEM.RegisterRd = ID/EX.RegisterRs2))</span><br><span class="line">and (MEM/WB.RegisterRd = ID/EX.RegisterRs2)) ForwardB = 01</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="数据冒险与停顿"><a href="#数据冒险与停顿" class="headerlink" title="数据冒险与停顿"></a>数据冒险与停顿</h2><p>当一条指令在加载指令写入一个寄存器之后读取这个寄存器，前递无法解决冒险。</p>
+<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/data_hazard_and_stall_example.jpg" class="" title="加载指令导致前递无法解决的冒险">
+
+<p>此时需要增加冒险检测单元添加流水线阻塞，阻塞条件为：</p>
+<figure class="highlight plaintext"><table><tr><td class="code"><pre><span class="line">if (ID/EX.MemRead and</span><br><span class="line">	((ID/EX.RegisterRd = IF/ID.RegisterRs1) or</span><br><span class="line">	(ID/EX.RegisterRd = IF/ID.RegisterRs2))) stall the pipeline</span><br></pre></td></tr></table></figure>
+
+<p>阻塞的硬件实现：</p>
+<ol>
+<li>禁止 PC 寄存器和 IF&#x2F;ID 流水线寄存器改变(保护寄存器)</li>
+<li>EX 阶段开始的流水线后半部分执行<strong>空指令</strong>，解出 EX ， MEM 和 WB 阶段的七个控制信号(设置为0)</li>
+</ol>
+<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_control.jpg" class="" title="流水线控制图概览">
+
+
+
+<h1 id="控制冒险"><a href="#控制冒险" class="headerlink" title="控制冒险"></a>控制冒险</h1><h2 id="静态预测：假设分支不发生"><a href="#静态预测：假设分支不发生" class="headerlink" title="静态预测：假设分支不发生"></a>静态预测：假设分支不发生</h2><p>如果条件分支不发生的概率时 50% ，且丢弃指令的代价很小，这种优化可以减少一半由控制冒险带来的代价。</p>
+<p>丢弃指令的硬件实现：</p>
+<ol>
+<li>将分支指令到达 MEM 阶段时 IF ， ID 和 EX 阶段的三条指令的控制信号置为0</li>
+</ol>
+<h2 id="缩短分支延迟"><a href="#缩短分支延迟" class="headerlink" title="缩短分支延迟"></a>缩短分支延迟</h2><p>将计算分支目标地址和判断分支条件提早发生(在 ID 阶段进行分支地址的计算和相等判断)。</p>
+<p>困难：</p>
+<ol>
+<li>分支条件可能依赖于流水线上的结果，因此需要新的前递逻辑</li>
+<li>在 ID 阶段分支比较需要的值可能之后才会产生( ALU 指令接着分支，加载指令接着分支)，流水线停顿是必须的</li>
+</ol>
+<p>清除IF阶段指令：添加一条 IF.Flush 控制线，将 IF&#x2F;ID 流水线寄存器指令字段设置为 0 (空操作)。</p>
+<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/reduce_branch_delay.png" class="" title="缩短分支延迟">
+
+<p>优化能力：将分支发生的代价减轻为一条指令</p>
+<h2 id="动态分支预测"><a href="#动态分支预测" class="headerlink" title="动态分支预测"></a>动态分支预测</h2><p>实现方案：<strong>分支预测缓存</strong>或<strong>分支历史表</strong></p>
+<p>分支预测缓存：一块按照分支指令的低位地址定位的小容量存储器，包含 1 个比特，用于表明一个分支最近是否发生跳转</p>
+<p>缺点：即使一个分支条件总是发生跳转，但一旦其不发生跳转时，就会造成两次预测错误，而不是只造成一次错误</p>
+<p>纠正： 2 位预测机制(有限状态自动机)</p>
+<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/2bit_predictor.png" class="" title="2位预测机制的有限状态自动机">
+
+<p>分支目标缓存：分支预测其只告知条件分支是否发生跳转，但依然需要对分支目标地址进行计算。在五级流水线中，这种计算需要一个时钟周期。一种解决方案是 <strong>缓存目标地址</strong></p>
+<p>其他预测器：</p>
+<ol>
+<li>相关预测器：组合了特殊分支指令的局部行为和最近执行的一些分支指令的全局行为信息的分支预测器</li>
+<li>锦标赛预测器：一个对于每个分支具有多种预测的分支预测器，其具有一种选择机制，该机制选择对于给定分支选择哪个预测器作为预测结果</li>
+</ol>
+<h1 id="异常和中断"><a href="#异常和中断" class="headerlink" title="异常和中断"></a>异常和中断</h1><h2 id="RISC-V体系结构中异常处理"><a href="#RISC-V体系结构中异常处理" class="headerlink" title="RISC-V体系结构中异常处理"></a>RISC-V体系结构中异常处理</h2><p>必须执行的基本动作：在 <strong>系统异常程序计数器(Supervisor Exception Program Counter， SEPC)</strong> 中保存发生异常的指令地址，同时将控制权转交给操作系统</p>
+<p>**系统异常原因寄存器(Supervisor Exception Cause Register， SCAUSE)**：记录异常产生原因</p>
+<p>**向量式终端(vectored interrupt)**：用基址寄存器加上例外原因(作为偏移)作为目标地址来完成控制流转换</p>
+<p>假设，我们使用统一入口地址方式（系统异常原因寄存器）实现异常处理，设置地址为 0x 0000 0000 1C09 0000。因此，需要添加两个额外的寄存器： </p>
+<ol>
+<li>SEPC：64位寄存器，保存异常指令的地址（向量式也需要）</li>
+<li>SCAUSE：64位寄存器，大多数位未被使用</li>
+</ol>
+<h2 id="流水线实现中的异常"><a href="#流水线实现中的异常" class="headerlink" title="流水线实现中的异常"></a>流水线实现中的异常</h2><p>将异常处理堪称另一种控制冒险，清除掉异常指令之后的指令。与处理分支指令不同的是，异常会引起系统状态变化。</p>
+<p>硬件实现：</p>
+<ol>
+<li>对进入译码阶段的指令，增加逻辑控制译码阶段的多选器输出为 0，流水线停顿</li>
+<li>添加新的控制信号 ID.Flush，与来自冒险检测单元的 stall 信号进行或操作</li>
+<li>添加新的控制信号 EX.Flush，杀跌多选器输出为 0</li>
+<li>为 PC 多选器增加新的输入，保证能将例外入口地址送给 PC 寄存器</li>
+</ol>
+<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_exception.png" class="" title="流水线异常处理">
+
+<p>SEPC 寄存器保存引发例外的指令地址。如果由多个例外同时发生，SCAUSE 寄存器中记录当前最高优先级的例外信息。</p>
+]]></content>
+      <categories>
+        <category>计算机体系结构</category>
+      </categories>
+      <tags>
+        <tag>计算机组成与设计RISC-V笔记</tag>
+      </tags>
   </entry>
 </search>

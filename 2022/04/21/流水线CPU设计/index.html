@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 5.4.2">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/all.min.css">
+
+<script id="hexo-configurations">
+    var NexT = window.NexT || {};
+    var CONFIG = {"hostname":"gayler-z.github.io","root":"/","scheme":"Pisces","version":"7.8.0","exturl":false,"sidebar":{"position":"left","display":"post","padding":18,"offset":12,"onmobile":false},"copycode":{"enable":false,"show_result":false,"style":null},"back2top":{"enable":true,"sidebar":false,"scrollpercent":false},"bookmark":{"enable":false,"color":"#222","save":"auto"},"fancybox":false,"mediumzoom":false,"lazyload":false,"pangu":false,"comments":{"style":"tabs","active":null,"storage":true,"lazyload":false,"nav":null},"algolia":{"hits":{"per_page":10},"labels":{"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}},"localsearch":{"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},"motion":{"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},"path":"search.xml"};
+  </script>
+
+  <meta name="description" content="流水线冒险(hazard)结构冒险(structural hazard)硬件不支持多条指令在同一时钟周期执行。 解决方法： 增加功能部件 数据冒险(data hazard)数据相关 12add	x1, x2, x3sub	x4, x1, x5  解决方法：  阻塞 旁路（前递）(forwarding)    若第一条指令是 load x1 则需要在第四个阶段数据才可用，对于 sub 指令第三个阶段">
+<meta property="og:type" content="article">
+<meta property="og:title" content="流水线">
+<meta property="og:url" content="https://gayler-z.github.io/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/index.html">
+<meta property="og:site_name" content="Gayler&#39;s Blog">
+<meta property="og:description" content="流水线冒险(hazard)结构冒险(structural hazard)硬件不支持多条指令在同一时钟周期执行。 解决方法： 增加功能部件 数据冒险(data hazard)数据相关 12add	x1, x2, x3sub	x4, x1, x5  解决方法：  阻塞 旁路（前递）(forwarding)    若第一条指令是 load x1 则需要在第四个阶段数据才可用，对于 sub 指令第三个阶段">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://gayler-z.github.io/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/forwarding.bmp">
+<meta property="og:image" content="https://gayler-z.github.io/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/load_use_data_hazard.bmp">
+<meta property="og:image" content="https://gayler-z.github.io/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_datapath.bmp">
+<meta property="og:image" content="https://gayler-z.github.io/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_control.bmp">
+<meta property="og:image" content="https://gayler-z.github.io/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/data_hazard_example.bmp">
+<meta property="og:image" content="https://gayler-z.github.io/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/data_hazard_and_stall_example.jpg">
+<meta property="og:image" content="https://gayler-z.github.io/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_control.jpg">
+<meta property="og:image" content="https://gayler-z.github.io/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/reduce_branch_delay.png">
+<meta property="og:image" content="https://gayler-z.github.io/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/2bit_predictor.png">
+<meta property="og:image" content="https://gayler-z.github.io/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_exception.png">
+<meta property="article:published_time" content="2022-04-21T12:33:57.000Z">
+<meta property="article:modified_time" content="2022-04-22T12:39:56.227Z">
+<meta property="article:author" content="Gayler">
+<meta property="article:tag" content="计算机组成与设计RISC-V笔记">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://gayler-z.github.io/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/forwarding.bmp">
+
+<link rel="canonical" href="https://gayler-z.github.io/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome : false,
+    isPost : true,
+    lang   : 'zh-CN'
+  };
+</script>
+
+  <title>流水线 | Gayler's Blog</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+
+  <div class="site-meta">
+
+    <a href="/" class="brand" rel="start">
+      <span class="logo-line-before"><i></i></span>
+      <h1 class="site-title">Gayler's Blog</h1>
+      <span class="logo-line-after"><i></i></span>
+    </a>
+      <p class="site-subtitle" itemprop="description">Trying to do better</p>
+  </div>
+
+  <div class="site-nav-right">
+    <div class="toggle popup-trigger">
+        <i class="fa fa-search fa-fw fa-lg"></i>
+    </div>
+  </div>
+</div>
+
+
+
+
+<nav class="site-nav">
+  <ul id="menu" class="main-menu menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-home fa-fw"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-tags fa-fw"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-th fa-fw"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-archive fa-fw"></i>归档</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+</nav>
+
+
+
+  <div class="search-pop-overlay">
+    <div class="popup search-popup">
+        <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocapitalize="off"
+           placeholder="搜索..." spellcheck="false"
+           type="search" class="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result">
+  <div id="no-result">
+    <i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>
+  </div>
+</div>
+
+    </div>
+  </div>
+
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content post posts-expand">
+            
+
+    
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block" lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://gayler-z.github.io/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.gif">
+      <meta itemprop="name" content="Gayler">
+      <meta itemprop="description" content="">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="Gayler's Blog">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          流水线
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-calendar"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2022-04-21 20:33:57" itemprop="dateCreated datePublished" datetime="2022-04-21T20:33:57+08:00">2022-04-21</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="far fa-calendar-check"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2022-04-22 20:39:56" itemprop="dateModified" datetime="2022-04-22T20:39:56+08:00">2022-04-22</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="far fa-folder"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/%E8%AE%A1%E7%AE%97%E6%9C%BA%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84/" itemprop="url" rel="index"><span itemprop="name">计算机体系结构</span></a>
+                </span>
+            </span>
+
+          
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="流水线冒险-hazard"><a href="#流水线冒险-hazard" class="headerlink" title="流水线冒险(hazard)"></a>流水线冒险(hazard)</h1><h2 id="结构冒险-structural-hazard"><a href="#结构冒险-structural-hazard" class="headerlink" title="结构冒险(structural hazard)"></a>结构冒险(structural hazard)</h2><p>硬件不支持多条指令在同一时钟周期执行。</p>
+<p>解决方法：</p>
+<p>增加功能部件</p>
+<h2 id="数据冒险-data-hazard"><a href="#数据冒险-data-hazard" class="headerlink" title="数据冒险(data hazard)"></a>数据冒险(data hazard)</h2><p>数据相关</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">add	x1, x2, x3</span><br><span class="line">sub	x4, x1, x5</span><br></pre></td></tr></table></figure>
+
+<p>解决方法：</p>
+<ul>
+<li>阻塞</li>
+<li>旁路（前递）(forwarding)</li>
+</ul>
+<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/forwarding.bmp" class="" title="流水线前递">
+
+<p>若第一条指令是 <code>load x1</code> 则需要在第四个阶段数据才可用，对于 <code>sub</code> 指令第三个阶段的输入来说太迟了，造成 <strong>载入-使用型数据冒险</strong> ，需要使用 <strong>流水线停顿</strong> 处理。</p>
+<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/load_use_data_hazard.bmp" class="" title="载入-使用型数据冒险">
+
+
+
+<h2 id="控制冒险-control-hazard"><a href="#控制冒险-control-hazard" class="headerlink" title="控制冒险(control hazard)"></a>控制冒险(control hazard)</h2><p>需要根据一条指令的结果做出决定，而其他指令正在执行。</p>
+<p>解决方法：</p>
+<ul>
+<li>阻塞</li>
+<li>预测<ul>
+<li>静态预测：分支总是不发生</li>
+<li>动态预测：根据分支历史情况预测</li>
+</ul>
+</li>
+</ul>
+<h1 id="流水线数据通路和控制"><a href="#流水线数据通路和控制" class="headerlink" title="流水线数据通路和控制"></a>流水线数据通路和控制</h1><h2 id="流水线数据通路"><a href="#流水线数据通路" class="headerlink" title="流水线数据通路"></a>流水线数据通路</h2><p>将数据通路划分成五部分：</p>
+<ol>
+<li>IF：取指令</li>
+<li>ID：指令译码金额读寄存器</li>
+<li>EX：执行或计算地址</li>
+<li>MEM：数据存储器访问</li>
+<li>WB：写回</li>
+</ol>
+<p>PC可以被看做一个流水线寄存器，它给IF阶段提供数据。但PC是可见体系结构的一部分，发生例外时，PC中的内容 <strong>必须被保存</strong> ，而流水线寄存器中的内容可以被丢弃。</p>
+<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_datapath.bmp" class="" title="完整流水线数据通路">
+
+
+
+<h2 id="流水线控制"><a href="#流水线控制" class="headerlink" title="流水线控制"></a>流水线控制</h2><p>根据流水线阶段将控制线分成五组：</p>
+<ol>
+<li>IF：读指令存储器和写 PC 控制信号总是有效，无需其他控制</li>
+<li>ID：两个源寄存器总是位于相同的位置，无需其他控制</li>
+<li>EX：需要设置 ALUOp 和 ALUSrc 控制 ALU 的输入选择和操作选择</li>
+<li>MEM：需要设置 Branch ， MemRead 和 MemWrite 控制分支，加载和存储指令</li>
+<li>WB：需要设置 MemtoReg 和 RegWrite ，控制寄存器写入</li>
+</ol>
+<p>对控制线的需要从EX阶段开始，故可以在 ID 阶段为之后阶段创建控制信号，并将控制信号保存在流水线寄存器中。</p>
+<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_control.bmp" class="" title="流水线控制通路">
+
+
+
+<h1 id="流水线数据冒险：前递与停顿"><a href="#流水线数据冒险：前递与停顿" class="headerlink" title="流水线数据冒险：前递与停顿"></a>流水线数据冒险：前递与停顿</h1><p>多条数据相关指令：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">sub	x2, x1, x3</span><br><span class="line">and	x12, x2, x5</span><br><span class="line">or	x13, x6, x2</span><br><span class="line">add	x14, x2, x2</span><br><span class="line">sd	x15, 100(x2)</span><br></pre></td></tr></table></figure>
+
+<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/data_hazard_example.bmp" class="" title="多周期流水线图">
+
+<p>在第三个时钟周期 <code>sub</code> 指令就产生结果，而 <code>and</code> 和 <code>or</code> 指令在第四和第五个周期才真正需要数据，因此只要将数据前递即可避免数据冒险。</p>
+<p>WB 阶段不存在数据冒险，因为可以通过前半周期写后半周期读来解决。</p>
+<p>两对冒险条件(存在冒险且不前递 <code>x0</code> 寄存器)：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">1.EX冒险</span><br><span class="line">if (EX/MEM.RegWrite</span><br><span class="line">and (EX/MEM.RegisterRd != 0) </span><br><span class="line">and (EX/MEM.RegisterRd = ID/EX.RegisterRs1)) ForwardA = 10</span><br><span class="line"></span><br><span class="line">if (EX/MEM.RegWrite</span><br><span class="line">and (EX/MEM.RegisterRd != 0)</span><br><span class="line">and (EX/MEM.RegisterRd = ID/EX.RegisterRs2)) ForwardB = 10</span><br><span class="line"></span><br><span class="line">2.MEM冒险</span><br><span class="line">if (MEM/WB.RegWrite</span><br><span class="line">and (MEM/WB.RegisterRd != 0)</span><br><span class="line">and (MEM/WB.RegisterRd = ID/EX.RegisterRs1)) ForwardA = 01</span><br><span class="line"></span><br><span class="line">if (MEM/WB.RegWrite</span><br><span class="line">and (MEM/WB.RegisterRd != 0)</span><br><span class="line">and (MEM/WB.RegisterRd = ID/EX.RegisterRs2)) ForwardB = 01</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="更为复杂的数据冒险"><a href="#更为复杂的数据冒险" class="headerlink" title="更为复杂的数据冒险"></a>更为复杂的数据冒险</h2><p>在 WB 阶段指令的结果， MEM 阶段指令的结果和 ALU 阶段指令的源操作数之间发生。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">add	x1, x1, x2</span><br><span class="line">add	x1, x1, x3</span><br><span class="line">add	x1, x1, x4</span><br></pre></td></tr></table></figure>
+
+<p>在这种情况下，结果应该来自 MEM 阶段前递的数据( EX&#x2F;MEM 寄存器的数据)，因为 MEM 阶段中的结果就是最近的结果。因此， MEM 冒险的控制为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">if (MEM/WB.RegWrite</span><br><span class="line">and (MEM/WB.RegisterRd != 0)</span><br><span class="line">and not (EX/MEM.RegWrite and (EX/MEM.RegisterRd != 0)</span><br><span class="line">		and (EX/MEM.RegisterRd = ID/EX.RegisterRs1))</span><br><span class="line">and (MEM/WB.RegisterRd = ID/EX.RegisterRs1)) ForwardA = 01</span><br><span class="line"></span><br><span class="line">if (MEM/WB.RegWrite</span><br><span class="line">and (MEM/WB.RegisterRd != 0)</span><br><span class="line">and not (EX/MEM.RegWrite and (EX/MEM.RegisterRd != 0)</span><br><span class="line">		and (EX/MEM.RegisterRd = ID/EX.RegisterRs2))</span><br><span class="line">and (MEM/WB.RegisterRd = ID/EX.RegisterRs2)) ForwardB = 01</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+<h2 id="数据冒险与停顿"><a href="#数据冒险与停顿" class="headerlink" title="数据冒险与停顿"></a>数据冒险与停顿</h2><p>当一条指令在加载指令写入一个寄存器之后读取这个寄存器，前递无法解决冒险。</p>
+<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/data_hazard_and_stall_example.jpg" class="" title="加载指令导致前递无法解决的冒险">
+
+<p>此时需要增加冒险检测单元添加流水线阻塞，阻塞条件为：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">if (ID/EX.MemRead and</span><br><span class="line">	((ID/EX.RegisterRd = IF/ID.RegisterRs1) or</span><br><span class="line">	(ID/EX.RegisterRd = IF/ID.RegisterRs2))) stall the pipeline</span><br></pre></td></tr></table></figure>
+
+<p>阻塞的硬件实现：</p>
+<ol>
+<li>禁止 PC 寄存器和 IF&#x2F;ID 流水线寄存器改变(保护寄存器)</li>
+<li>EX 阶段开始的流水线后半部分执行<strong>空指令</strong>，解出 EX ， MEM 和 WB 阶段的七个控制信号(设置为0)</li>
+</ol>
+<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_control.jpg" class="" title="流水线控制图概览">
+
+
+
+<h1 id="控制冒险"><a href="#控制冒险" class="headerlink" title="控制冒险"></a>控制冒险</h1><h2 id="静态预测：假设分支不发生"><a href="#静态预测：假设分支不发生" class="headerlink" title="静态预测：假设分支不发生"></a>静态预测：假设分支不发生</h2><p>如果条件分支不发生的概率时 50% ，且丢弃指令的代价很小，这种优化可以减少一半由控制冒险带来的代价。</p>
+<p>丢弃指令的硬件实现：</p>
+<ol>
+<li>将分支指令到达 MEM 阶段时 IF ， ID 和 EX 阶段的三条指令的控制信号置为0</li>
+</ol>
+<h2 id="缩短分支延迟"><a href="#缩短分支延迟" class="headerlink" title="缩短分支延迟"></a>缩短分支延迟</h2><p>将计算分支目标地址和判断分支条件提早发生(在 ID 阶段进行分支地址的计算和相等判断)。</p>
+<p>困难：</p>
+<ol>
+<li>分支条件可能依赖于流水线上的结果，因此需要新的前递逻辑</li>
+<li>在 ID 阶段分支比较需要的值可能之后才会产生( ALU 指令接着分支，加载指令接着分支)，流水线停顿是必须的</li>
+</ol>
+<p>清除IF阶段指令：添加一条 IF.Flush 控制线，将 IF&#x2F;ID 流水线寄存器指令字段设置为 0 (空操作)。</p>
+<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/reduce_branch_delay.png" class="" title="缩短分支延迟">
+
+<p>优化能力：将分支发生的代价减轻为一条指令</p>
+<h2 id="动态分支预测"><a href="#动态分支预测" class="headerlink" title="动态分支预测"></a>动态分支预测</h2><p>实现方案：<strong>分支预测缓存</strong>或<strong>分支历史表</strong></p>
+<p>分支预测缓存：一块按照分支指令的低位地址定位的小容量存储器，包含 1 个比特，用于表明一个分支最近是否发生跳转</p>
+<p>缺点：即使一个分支条件总是发生跳转，但一旦其不发生跳转时，就会造成两次预测错误，而不是只造成一次错误</p>
+<p>纠正： 2 位预测机制(有限状态自动机)</p>
+<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/2bit_predictor.png" class="" title="2位预测机制的有限状态自动机">
+
+<p>分支目标缓存：分支预测其只告知条件分支是否发生跳转，但依然需要对分支目标地址进行计算。在五级流水线中，这种计算需要一个时钟周期。一种解决方案是 <strong>缓存目标地址</strong></p>
+<p>其他预测器：</p>
+<ol>
+<li>相关预测器：组合了特殊分支指令的局部行为和最近执行的一些分支指令的全局行为信息的分支预测器</li>
+<li>锦标赛预测器：一个对于每个分支具有多种预测的分支预测器，其具有一种选择机制，该机制选择对于给定分支选择哪个预测器作为预测结果</li>
+</ol>
+<h1 id="异常和中断"><a href="#异常和中断" class="headerlink" title="异常和中断"></a>异常和中断</h1><h2 id="RISC-V体系结构中异常处理"><a href="#RISC-V体系结构中异常处理" class="headerlink" title="RISC-V体系结构中异常处理"></a>RISC-V体系结构中异常处理</h2><p>必须执行的基本动作：在 <strong>系统异常程序计数器(Supervisor Exception Program Counter， SEPC)</strong> 中保存发生异常的指令地址，同时将控制权转交给操作系统</p>
+<p>**系统异常原因寄存器(Supervisor Exception Cause Register， SCAUSE)**：记录异常产生原因</p>
+<p>**向量式终端(vectored interrupt)**：用基址寄存器加上例外原因(作为偏移)作为目标地址来完成控制流转换</p>
+<p>假设，我们使用统一入口地址方式（系统异常原因寄存器）实现异常处理，设置地址为 0x 0000 0000 1C09 0000。因此，需要添加两个额外的寄存器： </p>
+<ol>
+<li>SEPC：64位寄存器，保存异常指令的地址（向量式也需要）</li>
+<li>SCAUSE：64位寄存器，大多数位未被使用</li>
+</ol>
+<h2 id="流水线实现中的异常"><a href="#流水线实现中的异常" class="headerlink" title="流水线实现中的异常"></a>流水线实现中的异常</h2><p>将异常处理堪称另一种控制冒险，清除掉异常指令之后的指令。与处理分支指令不同的是，异常会引起系统状态变化。</p>
+<p>硬件实现：</p>
+<ol>
+<li>对进入译码阶段的指令，增加逻辑控制译码阶段的多选器输出为 0，流水线停顿</li>
+<li>添加新的控制信号 ID.Flush，与来自冒险检测单元的 stall 信号进行或操作</li>
+<li>添加新的控制信号 EX.Flush，杀跌多选器输出为 0</li>
+<li>为 PC 多选器增加新的输入，保证能将例外入口地址送给 PC 寄存器</li>
+</ol>
+<img src="/2022/04/21/%E6%B5%81%E6%B0%B4%E7%BA%BFCPU%E8%AE%BE%E8%AE%A1/pipeline_exception.png" class="" title="流水线异常处理">
+
+<p>SEPC 寄存器保存引发例外的指令地址。如果由多个例外同时发生，SCAUSE 寄存器中记录当前最高优先级的例外信息。</p>
+
+    </div>
+
+    
+    
+    
+
+      <footer class="post-footer">
+          <div class="post-tags">
+              <a href="/tags/%E8%AE%A1%E7%AE%97%E6%9C%BA%E7%BB%84%E6%88%90%E4%B8%8E%E8%AE%BE%E8%AE%A1RISC-V%E7%AC%94%E8%AE%B0/" rel="tag"># 计算机组成与设计RISC-V笔记</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item"></div>
+      <div class="post-nav-item">
+    <a href="/2022/04/21/Typora%E7%A0%B4%E8%A7%A3/" rel="next" title="Typora破解">
+      Typora破解 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+
+
+          </div>
+          
+
+<script>
+  window.addEventListener('tabs:register', () => {
+    let { activeClass } = CONFIG.comments;
+    if (CONFIG.comments.storage) {
+      activeClass = localStorage.getItem('comments_active') || activeClass;
+    }
+    if (activeClass) {
+      let activeTab = document.querySelector(`a[href="#comment-${activeClass}"]`);
+      if (activeTab) {
+        activeTab.click();
+      }
+    }
+  });
+  if (CONFIG.comments.storage) {
+    window.addEventListener('tabs:click', event => {
+      if (!event.target.matches('.tabs-comment .tab-content .tab-pane')) return;
+      let commentClass = event.target.classList[1];
+      localStorage.setItem('comments_active', commentClass);
+    });
+  }
+</script>
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%86%92%E9%99%A9-hazard"><span class="nav-number">1.</span> <span class="nav-text">流水线冒险(hazard)</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BB%93%E6%9E%84%E5%86%92%E9%99%A9-structural-hazard"><span class="nav-number">1.1.</span> <span class="nav-text">结构冒险(structural hazard)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%86%92%E9%99%A9-data-hazard"><span class="nav-number">1.2.</span> <span class="nav-text">数据冒险(data hazard)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%8E%A7%E5%88%B6%E5%86%92%E9%99%A9-control-hazard"><span class="nav-number">1.3.</span> <span class="nav-text">控制冒险(control hazard)</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B5%81%E6%B0%B4%E7%BA%BF%E6%95%B0%E6%8D%AE%E9%80%9A%E8%B7%AF%E5%92%8C%E6%8E%A7%E5%88%B6"><span class="nav-number">2.</span> <span class="nav-text">流水线数据通路和控制</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%81%E6%B0%B4%E7%BA%BF%E6%95%B0%E6%8D%AE%E9%80%9A%E8%B7%AF"><span class="nav-number">2.1.</span> <span class="nav-text">流水线数据通路</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%81%E6%B0%B4%E7%BA%BF%E6%8E%A7%E5%88%B6"><span class="nav-number">2.2.</span> <span class="nav-text">流水线控制</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%B5%81%E6%B0%B4%E7%BA%BF%E6%95%B0%E6%8D%AE%E5%86%92%E9%99%A9%EF%BC%9A%E5%89%8D%E9%80%92%E4%B8%8E%E5%81%9C%E9%A1%BF"><span class="nav-number">3.</span> <span class="nav-text">流水线数据冒险：前递与停顿</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%9B%B4%E4%B8%BA%E5%A4%8D%E6%9D%82%E7%9A%84%E6%95%B0%E6%8D%AE%E5%86%92%E9%99%A9"><span class="nav-number">3.1.</span> <span class="nav-text">更为复杂的数据冒险</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%95%B0%E6%8D%AE%E5%86%92%E9%99%A9%E4%B8%8E%E5%81%9C%E9%A1%BF"><span class="nav-number">3.2.</span> <span class="nav-text">数据冒险与停顿</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E6%8E%A7%E5%88%B6%E5%86%92%E9%99%A9"><span class="nav-number">4.</span> <span class="nav-text">控制冒险</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#%E9%9D%99%E6%80%81%E9%A2%84%E6%B5%8B%EF%BC%9A%E5%81%87%E8%AE%BE%E5%88%86%E6%94%AF%E4%B8%8D%E5%8F%91%E7%94%9F"><span class="nav-number">4.1.</span> <span class="nav-text">静态预测：假设分支不发生</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E7%BC%A9%E7%9F%AD%E5%88%86%E6%94%AF%E5%BB%B6%E8%BF%9F"><span class="nav-number">4.2.</span> <span class="nav-text">缩短分支延迟</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E5%8A%A8%E6%80%81%E5%88%86%E6%94%AF%E9%A2%84%E6%B5%8B"><span class="nav-number">4.3.</span> <span class="nav-text">动态分支预测</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#%E5%BC%82%E5%B8%B8%E5%92%8C%E4%B8%AD%E6%96%AD"><span class="nav-number">5.</span> <span class="nav-text">异常和中断</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#RISC-V%E4%BD%93%E7%B3%BB%E7%BB%93%E6%9E%84%E4%B8%AD%E5%BC%82%E5%B8%B8%E5%A4%84%E7%90%86"><span class="nav-number">5.1.</span> <span class="nav-text">RISC-V体系结构中异常处理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#%E6%B5%81%E6%B0%B4%E7%BA%BF%E5%AE%9E%E7%8E%B0%E4%B8%AD%E7%9A%84%E5%BC%82%E5%B8%B8"><span class="nav-number">5.2.</span> <span class="nav-text">流水线实现中的异常</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+  <p class="site-author-name" itemprop="name">Gayler</p>
+  <div class="site-description" itemprop="description"></div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">2</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">2</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">1</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+        
+
+<div class="copyright">
+  
+  &copy; 
+  <span itemprop="copyrightYear">2022</span>
+  <span class="with-love">
+    <i class="fa fa-heart"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Gayler</span>
+</div>
+
+        
+
+
+
+
+
+
+
+
+      </div>
+    </footer>
+  </div>
+
+  
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+
+<script src="/js/utils.js"></script>
+
+<script src="/js/motion.js"></script>
+
+
+<script src="/js/schemes/pisces.js"></script>
+
+
+<script src="/js/next-boot.js"></script>
+
+
+
+
+  
+
+
+
+
+  
+<script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+
+</body>
+</html>
